@@ -1,0 +1,159 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Order",
+  "description": "A customer order with nested items and address",
+  "type": "object",
+  "required": ["order_id", "customer", "items", "shipping_address"],
+  "properties": {
+    "order_id": {
+      "type": "string",
+      "pattern": "^ORD-[0-9]{6}$",
+      "description": "Order identifier (format: ORD-XXXXXX)"
+    },
+    "customer": {
+      "$ref": "#/$defs/customer",
+      "description": "Customer information"
+    },
+    "items": {
+      "type": "array",
+      "minItems": 1,
+      "description": "List of ordered items",
+      "items": {
+        "$ref": "#/$defs/order_item"
+      }
+    },
+    "shipping_address": {
+      "$ref": "#/$defs/address",
+      "description": "Shipping address"
+    },
+    "billing_address": {
+      "$ref": "#/$defs/address",
+      "description": "Billing address (optional, defaults to shipping)"
+    },
+    "discount_code": {
+      "type": "string",
+      "pattern": "^DISC-[A-Z0-9]{4,10}$",
+      "description": "Optional discount code"
+    },
+    "notes": {
+      "type": "string",
+      "maxLength": 500
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "customer": {
+      "type": "object",
+      "required": ["customer_id", "name", "email"],
+      "properties": {
+        "customer_id": {
+          "type": "string",
+          "pattern": "^CUST-[0-9]{5}$",
+          "description": "Customer identifier (format: CUST-XXXXX)"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100,
+          "description": "Full name of the customer"
+        },
+        "email": {
+          "type": "string",
+          "format": "email",
+          "description": "Customer email address"
+        },
+        "phone": {
+          "type": "string",
+          "pattern": "^\\+?[0-9\\-\\s]{7,20}$",
+          "description": "Phone number"
+        }
+      },
+      "additionalProperties": false
+    },
+    "address": {
+      "type": "object",
+      "required": ["street", "city", "postal_code", "country"],
+      "properties": {
+        "street": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Street address"
+        },
+        "city": {
+          "type": "string",
+          "minLength": 1,
+          "description": "City"
+        },
+        "state": {
+          "type": "string",
+          "description": "State or province"
+        },
+        "postal_code": {
+          "type": "string",
+          "pattern": "^[A-Z0-9\\-\\s]{3,10}$",
+          "description": "Postal/ZIP code"
+        },
+        "country": {
+          "type": "string",
+          "enum": ["US", "CA", "GB", "FR", "DE", "ES", "IT", "JP", "AU"],
+          "description": "Country code (ISO 3166-1 alpha-2)"
+        }
+      },
+      "additionalProperties": false
+    },
+    "order_item": {
+      "type": "object",
+      "required": ["product_id", "product_name", "quantity", "unit_price"],
+      "properties": {
+        "product_id": {
+          "type": "string",
+          "pattern": "^PROD-[0-9]{4}$",
+          "description": "Product identifier (format: PROD-XXXX)"
+        },
+        "product_name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200,
+          "description": "Name of the product"
+        },
+        "quantity": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 999,
+          "description": "Quantity ordered"
+        },
+        "unit_price": {
+          "type": "number",
+          "minimum": 0.01,
+          "maximum": 99999.99,
+          "description": "Price per unit in USD"
+        },
+        "options": {
+          "$ref": "#/$defs/item_options",
+          "description": "Product customization options"
+        }
+      },
+      "additionalProperties": false
+    },
+    "item_options": {
+      "type": "object",
+      "properties": {
+        "size": {
+          "type": "string",
+          "enum": ["XS", "S", "M", "L", "XL", "XXL"],
+          "description": "Size selection"
+        },
+        "color": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Color selection"
+        },
+        "gift_wrap": {
+          "type": "boolean",
+          "description": "Whether to gift wrap this item"
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}
